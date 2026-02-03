@@ -1,5 +1,7 @@
 package com.homesolutions;
 
+import com.homesolutions.dto.AdminLoginRequest;
+import com.homesolutions.dto.AdminRegisterRequest;
 import com.homesolutions.dto.AuthResponse;
 import com.homesolutions.dto.LoginRequest;
 import com.homesolutions.dto.RegisterRequest;
@@ -50,7 +52,6 @@ class AuthServiceImplTest {
     @BeforeEach
     void setUp() {
         customerRegisterRequest = RegisterRequest.builder()
-                .phone("1234567890")
                 .email("customer@test.com")
                 .fullName("Test Customer")
                 .password("password123")
@@ -58,7 +59,6 @@ class AuthServiceImplTest {
                 .build();
 
         expertRegisterRequest = RegisterRequest.builder()
-                .phone("9876543210")
                 .email("expert@test.com")
                 .fullName("Test Expert")
                 .password("password123")
@@ -66,7 +66,7 @@ class AuthServiceImplTest {
                 .build();
 
         loginRequest = LoginRequest.builder()
-                .phone("1234567890")
+                .email("customer@test.com")
                 .password("password123")
                 .build();
 
@@ -75,7 +75,6 @@ class AuthServiceImplTest {
 
         mockUser = User.builder()
                 .id(1L)
-                .phone("1234567890")
                 .email("customer@test.com")
                 .fullName("Test Customer")
                 .password("encodedPassword")
@@ -86,11 +85,10 @@ class AuthServiceImplTest {
 
     @Test
     void testRegisterCustomer_Success() {
-        when(userRepository.existsByPhone(customerRegisterRequest.getPhone())).thenReturn(false);
         when(userRepository.existsByEmail(customerRegisterRequest.getEmail())).thenReturn(false);
         when(passwordEncoder.encode(customerRegisterRequest.getPassword())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(mockUser);
-        when(jwtUtil.generateToken(mockUser.getPhone())).thenReturn("jwt-token");
+        when(jwtUtil.generateToken(mockUser.getEmail())).thenReturn("jwt-token");
 
         AuthResponse response = authService.register(customerRegisterRequest);
 
@@ -98,15 +96,14 @@ class AuthServiceImplTest {
         assertThat(response.getToken()).isEqualTo("jwt-token");
         assertThat(response.getType()).isEqualTo("Bearer");
         assertThat(response.getUserId()).isEqualTo(1L);
-        assertThat(response.getPhone()).isEqualTo("1234567890");
+        assertThat(response.getEmail()).isEqualTo("customer@test.com");
         assertThat(response.getFullName()).isEqualTo("Test Customer");
         assertThat(response.getRoles()).contains("ROLE_CUSTOMER");
 
-        verify(userRepository).existsByPhone(customerRegisterRequest.getPhone());
         verify(userRepository).existsByEmail(customerRegisterRequest.getEmail());
         verify(passwordEncoder).encode(customerRegisterRequest.getPassword());
         verify(userRepository).save(any(User.class));
-        verify(jwtUtil).generateToken(mockUser.getPhone());
+        verify(jwtUtil).generateToken(mockUser.getEmail());
     }
 
     @Test
@@ -116,7 +113,6 @@ class AuthServiceImplTest {
 
         User expertUser = User.builder()
                 .id(2L)
-                .phone("9876543210")
                 .email("expert@test.com")
                 .fullName("Test Expert")
                 .password("encodedPassword")
@@ -124,11 +120,10 @@ class AuthServiceImplTest {
                 .enabled(true)
                 .build();
 
-        when(userRepository.existsByPhone(expertRegisterRequest.getPhone())).thenReturn(false);
         when(userRepository.existsByEmail(expertRegisterRequest.getEmail())).thenReturn(false);
         when(passwordEncoder.encode(expertRegisterRequest.getPassword())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(expertUser);
-        when(jwtUtil.generateToken(expertUser.getPhone())).thenReturn("jwt-token-expert");
+        when(jwtUtil.generateToken(expertUser.getEmail())).thenReturn("jwt-token-expert");
 
         AuthResponse response = authService.register(expertRegisterRequest);
 
@@ -137,27 +132,49 @@ class AuthServiceImplTest {
         assertThat(response.getUserId()).isEqualTo(2L);
         assertThat(response.getRoles()).contains("ROLE_EXPERT");
 
-        verify(userRepository).existsByPhone(expertRegisterRequest.getPhone());
+        verify(userRepository).existsByEmail(expertRegisterRequest.getEmail());
         verify(userRepository).save(any(User.class));
     }
 
     @Test
     void testRegister_PhoneAlreadyExists() {
-        when(userRepository.existsByPhone(customerRegisterRequest.getPhone())).thenReturn(true);
+        RegisterRequest request = RegisterRequest.builder()
+                .phone("1234567890")
+                .email("newuser@test.com")
+                .fullName("New User")
+                .password("password123")
+                .role("CUSTOMER")
+                .build();
 
-        assertThatThrownBy(() -> authService.register(customerRegisterRequest))
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
+        when(userRepository.existsByPhone(request.getPhone())).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.register(request))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Phone number already registered");
 
-        verify(userRepository).existsByPhone(customerRegisterRequest.getPhone());
+        verify(userRepository).existsByEmail(request.getEmail());
+        verify(userRepository).existsByPhone(request.getPhone());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void testRegister_EmailAlreadyExists() {
+        when(userRepository.existsByEmail(customerRegisterRequest.getEmail())).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.register(customerRegisterRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Email already registered");
+
+        verify(userRepository).existsByEmail(customerRegisterRequest.getEmail());
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void testLogin_Success() {
-        when(userRepository.findByPhone(loginRequest.getPhone())).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(loginRequest.getPassword(), mockUser.getPassword())).thenReturn(true);
-        when(jwtUtil.generateToken(mockUser.getPhone())).thenReturn("jwt-token");
+        when(jwtUtil.generateToken(mockUser.getEmail())).thenReturn("jwt-token");
 
         AuthResponse response = authService.login(loginRequest);
 
@@ -165,24 +182,168 @@ class AuthServiceImplTest {
         assertThat(response.getToken()).isEqualTo("jwt-token");
         assertThat(response.getType()).isEqualTo("Bearer");
         assertThat(response.getUserId()).isEqualTo(1L);
-        assertThat(response.getPhone()).isEqualTo("1234567890");
+        assertThat(response.getEmail()).isEqualTo("customer@test.com");
 
-        verify(userRepository).findByPhone(loginRequest.getPhone());
+        verify(userRepository).findByEmail(loginRequest.getEmail());
         verify(passwordEncoder).matches(loginRequest.getPassword(), mockUser.getPassword());
-        verify(jwtUtil).generateToken(mockUser.getPhone());
+        verify(jwtUtil).generateToken(mockUser.getEmail());
     }
 
     @Test
     void testLogin_InvalidCredentials() {
-        when(userRepository.findByPhone(loginRequest.getPhone())).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(loginRequest.getPassword(), mockUser.getPassword())).thenReturn(false);
 
         assertThatThrownBy(() -> authService.login(loginRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Invalid credentials");
 
-        verify(userRepository).findByPhone(loginRequest.getPhone());
+        verify(userRepository).findByEmail(loginRequest.getEmail());
         verify(passwordEncoder).matches(loginRequest.getPassword(), mockUser.getPassword());
+        verify(jwtUtil, never()).generateToken(anyString());
+    }
+
+    @Test
+    void testRegisterAdmin_Success() {
+        AdminRegisterRequest adminRegisterRequest = AdminRegisterRequest.builder()
+                .email("admin@test.com")
+                .fullName("Test Admin")
+                .password("password123")
+                .build();
+
+        Set<String> adminRoles = new HashSet<>();
+        adminRoles.add("ROLE_ADMIN");
+
+        User adminUser = User.builder()
+                .id(3L)
+                .email("admin@test.com")
+                .fullName("Test Admin")
+                .password("encodedPassword")
+                .roles(adminRoles)
+                .enabled(true)
+                .build();
+
+        when(userRepository.existsByEmail(adminRegisterRequest.getEmail())).thenReturn(false);
+        when(passwordEncoder.encode(adminRegisterRequest.getPassword())).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenReturn(adminUser);
+        when(jwtUtil.generateToken(adminUser.getEmail())).thenReturn("jwt-token-admin");
+
+        AuthResponse response = authService.registerAdmin(adminRegisterRequest);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getToken()).isEqualTo("jwt-token-admin");
+        assertThat(response.getType()).isEqualTo("Bearer");
+        assertThat(response.getUserId()).isEqualTo(3L);
+        assertThat(response.getEmail()).isEqualTo("admin@test.com");
+        assertThat(response.getRoles()).contains("ROLE_ADMIN");
+
+        verify(userRepository).existsByEmail(adminRegisterRequest.getEmail());
+        verify(passwordEncoder).encode(adminRegisterRequest.getPassword());
+        verify(userRepository).save(any(User.class));
+        verify(jwtUtil).generateToken(adminUser.getEmail());
+    }
+
+    @Test
+    void testRegisterAdmin_EmailAlreadyExists() {
+        AdminRegisterRequest adminRegisterRequest = AdminRegisterRequest.builder()
+                .email("admin@test.com")
+                .fullName("Test Admin")
+                .password("password123")
+                .build();
+
+        when(userRepository.existsByEmail(adminRegisterRequest.getEmail())).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.registerAdmin(adminRegisterRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Email already registered");
+
+        verify(userRepository).existsByEmail(adminRegisterRequest.getEmail());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void testLoginAdmin_Success() {
+        AdminLoginRequest adminLoginRequest = AdminLoginRequest.builder()
+                .email("admin@test.com")
+                .password("password123")
+                .build();
+
+        Set<String> adminRoles = new HashSet<>();
+        adminRoles.add("ROLE_ADMIN");
+
+        User adminUser = User.builder()
+                .id(3L)
+                .email("admin@test.com")
+                .fullName("Test Admin")
+                .password("encodedPassword")
+                .roles(adminRoles)
+                .enabled(true)
+                .build();
+
+        when(userRepository.findByEmail(adminLoginRequest.getEmail())).thenReturn(Optional.of(adminUser));
+        when(passwordEncoder.matches(adminLoginRequest.getPassword(), adminUser.getPassword())).thenReturn(true);
+        when(jwtUtil.generateToken(adminUser.getEmail())).thenReturn("jwt-token-admin");
+
+        AuthResponse response = authService.loginAdmin(adminLoginRequest);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getToken()).isEqualTo("jwt-token-admin");
+        assertThat(response.getType()).isEqualTo("Bearer");
+        assertThat(response.getUserId()).isEqualTo(3L);
+        assertThat(response.getEmail()).isEqualTo("admin@test.com");
+        assertThat(response.getRoles()).contains("ROLE_ADMIN");
+
+        verify(userRepository).findByEmail(adminLoginRequest.getEmail());
+        verify(passwordEncoder).matches(adminLoginRequest.getPassword(), adminUser.getPassword());
+        verify(jwtUtil).generateToken(adminUser.getEmail());
+    }
+
+    @Test
+    void testLoginAdmin_UserNotAdmin() {
+        AdminLoginRequest adminLoginRequest = AdminLoginRequest.builder()
+                .email("customer@test.com")
+                .password("password123")
+                .build();
+
+        when(userRepository.findByEmail(adminLoginRequest.getEmail())).thenReturn(Optional.of(mockUser));
+
+        assertThatThrownBy(() -> authService.loginAdmin(adminLoginRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("User is not an admin");
+
+        verify(userRepository).findByEmail(adminLoginRequest.getEmail());
+        verify(passwordEncoder, never()).matches(anyString(), anyString());
+        verify(jwtUtil, never()).generateToken(anyString());
+    }
+
+    @Test
+    void testLoginAdmin_InvalidCredentials() {
+        AdminLoginRequest adminLoginRequest = AdminLoginRequest.builder()
+                .email("admin@test.com")
+                .password("wrongpassword")
+                .build();
+
+        Set<String> adminRoles = new HashSet<>();
+        adminRoles.add("ROLE_ADMIN");
+
+        User adminUser = User.builder()
+                .id(3L)
+                .email("admin@test.com")
+                .fullName("Test Admin")
+                .password("encodedPassword")
+                .roles(adminRoles)
+                .enabled(true)
+                .build();
+
+        when(userRepository.findByEmail(adminLoginRequest.getEmail())).thenReturn(Optional.of(adminUser));
+        when(passwordEncoder.matches(adminLoginRequest.getPassword(), adminUser.getPassword())).thenReturn(false);
+
+        assertThatThrownBy(() -> authService.loginAdmin(adminLoginRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Invalid credentials");
+
+        verify(userRepository).findByEmail(adminLoginRequest.getEmail());
+        verify(passwordEncoder).matches(adminLoginRequest.getPassword(), adminUser.getPassword());
         verify(jwtUtil, never()).generateToken(anyString());
     }
 }
