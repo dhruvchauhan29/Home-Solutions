@@ -54,6 +54,7 @@
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/dto/UpdateProfileRequest.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/exception/GlobalExceptionHandler.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/mapper/AddressMapper.java
+/home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/util/BookingCleanupScheduler.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/security/CustomUserDetailsService.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/repository/ServiceRepository.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/exception/BusinessException.java

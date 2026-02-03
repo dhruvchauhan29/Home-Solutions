@@ -28,6 +28,7 @@ com/homesolutions/service/impl/AuthServiceImpl.class
 com/homesolutions/service/interfaces/ExpertService.class
 com/homesolutions/entity/Category$CategoryBuilder.class
 com/homesolutions/dto/RatingResponse$RatingResponseBuilder.class
+com/homesolutions/util/BookingCleanupScheduler.class
 com/homesolutions/config/SecurityConfig.class
 com/homesolutions/mapper/RatingMapper.class
 com/homesolutions/entity/User$UserBuilder.class
