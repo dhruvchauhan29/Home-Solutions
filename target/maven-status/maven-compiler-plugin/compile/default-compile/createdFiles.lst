@@ -16,6 +16,7 @@ com/homesolutions/dto/AddressResponse$AddressResponseBuilder.class
 com/homesolutions/entity/Payment$PaymentMethod.class
 com/homesolutions/dto/PaymentResponse.class
 com/homesolutions/controller/PricingController.class
+com/homesolutions/mapper/CategoryMapper.class
 com/homesolutions/dto/UserProfileResponse.class
 com/homesolutions/service/interfaces/PricingService.class
 com/homesolutions/entity/Category.class
@@ -28,6 +29,7 @@ com/homesolutions/service/interfaces/ExpertService.class
 com/homesolutions/entity/Category$CategoryBuilder.class
 com/homesolutions/dto/RatingResponse$RatingResponseBuilder.class
 com/homesolutions/config/SecurityConfig.class
+com/homesolutions/mapper/RatingMapper.class
 com/homesolutions/entity/User$UserBuilder.class
 com/homesolutions/exception/ResourceNotFoundException.class
 com/homesolutions/entity/Booking$BookingBuilder.class
@@ -54,13 +56,16 @@ com/homesolutions/entity/Ticket.class
 com/homesolutions/controller/AdminController.class
 com/homesolutions/dto/TicketResponse.class
 com/homesolutions/repository/AddressRepository.class
+com/homesolutions/mapper/PaymentMapper.class
 com/homesolutions/security/CustomUserDetailsService.class
 com/homesolutions/controller/ServiceController.class
 com/homesolutions/repository/RatingRepository.class
+com/homesolutions/mapper/UserMapper.class
 com/homesolutions/dto/RatingResponse.class
 com/homesolutions/entity/Address.class
 com/homesolutions/dto/TicketRequest.class
 com/homesolutions/config/OpenAPIConfig.class
+com/homesolutions/mapper/ServiceMapper.class
 com/homesolutions/dto/CategoryRequest$CategoryRequestBuilder.class
 com/homesolutions/HomesolutionsApplication.class
 com/homesolutions/dto/ErrorResponse.class
@@ -85,8 +90,10 @@ com/homesolutions/service/impl/CustomerServiceImpl.class
 com/homesolutions/dto/ServiceRequest$ServiceRequestBuilder.class
 com/homesolutions/service/interfaces/ServiceManagementService.class
 com/homesolutions/service/interfaces/CustomerService.class
+com/homesolutions/mapper/TicketMapper.class
 com/homesolutions/dto/QuoteResponse.class
 com/homesolutions/dto/PaymentRequest.class
+com/homesolutions/mapper/BookingMapper.class
 com/homesolutions/dto/QuoteRequest.class
 com/homesolutions/repository/CategoryRepository.class
 com/homesolutions/repository/TicketRepository.class
@@ -96,6 +103,7 @@ com/homesolutions/dto/ServiceRequest.class
 com/homesolutions/security/JwtAuthenticationFilter.class
 com/homesolutions/repository/ServiceRepository.class
 com/homesolutions/dto/AuthResponse$AuthResponseBuilder.class
+com/homesolutions/mapper/AddressMapper.class
 com/homesolutions/dto/AddressRequest$AddressRequestBuilder.class
 com/homesolutions/dto/CategoryRequest.class
 com/homesolutions/dto/PaymentResponse$PaymentResponseBuilder.class
