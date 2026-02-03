@@ -480,6 +480,7 @@ Error Codes:
 - `FORBIDDEN` (403)
 - `VALIDATION_ERROR` (400)
 - `DUPLICATE_EMAIL` (409) - Email already exists in database
+- `DUPLICATE_PHONE` (409) - Phone number already exists in database
 - `INTERNAL_SERVER_ERROR` (500)
 
 ## 📋 Requirements Checklist

@@ -98,11 +98,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         logger.error("Data integrity violation: {}", ex.getMessage());
         String message = "Email already exists";
+        String code = "DUPLICATE_EMAIL";
         if (ex.getMessage() != null && ex.getMessage().contains("phone")) {
             message = "Phone number already exists";
+            code = "DUPLICATE_PHONE";
         }
         ErrorResponse error = ErrorResponse.builder()
-                .code("DUPLICATE_EMAIL")
+                .code(code)
                 .message(message)
                 .timestamp(LocalDateTime.now())
                 .build();
