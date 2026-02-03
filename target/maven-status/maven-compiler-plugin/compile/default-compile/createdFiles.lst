@@ -51,6 +51,7 @@ com/homesolutions/entity/Ticket$TicketBuilder.class
 com/homesolutions/security/JwtUtil.class
 com/homesolutions/entity/Booking$BookingStatus.class
 com/homesolutions/dto/RatingRequest$RatingRequestBuilder.class
+com/homesolutions/repository/AdminRepository.class
 com/homesolutions/exception/GlobalExceptionHandler.class
 com/homesolutions/entity/Payment$PaymentStatus.class
 com/homesolutions/service/interfaces/AdminService.class
@@ -65,7 +66,9 @@ com/homesolutions/controller/ServiceController.class
 com/homesolutions/repository/RatingRepository.class
 com/homesolutions/mapper/UserMapper.class
 com/homesolutions/dto/RatingResponse.class
+com/homesolutions/entity/Admin$AdminBuilder.class
 com/homesolutions/entity/Address.class
+com/homesolutions/entity/Admin.class
 com/homesolutions/dto/TicketRequest.class
 com/homesolutions/config/OpenAPIConfig.class
 com/homesolutions/mapper/ServiceMapper.class
