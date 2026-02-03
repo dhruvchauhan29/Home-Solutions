@@ -124,9 +124,9 @@ class CustomerServiceImplTest {
 
     @Test
     void testGetProfile_Success() {
-        when(userRepository.findByPhone("1234567890")).thenReturn(Optional.of(mockCustomer));
+        when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(mockCustomer));
 
-        UserProfileResponse response = customerService.getProfile("1234567890");
+        UserProfileResponse response = customerService.getProfile("customer@test.com");
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
@@ -134,7 +134,7 @@ class CustomerServiceImplTest {
         assertThat(response.getEmail()).isEqualTo("customer@test.com");
         assertThat(response.getFullName()).isEqualTo("Test Customer");
 
-        verify(userRepository).findByPhone("1234567890");
+        verify(userRepository).findByEmail("customer@test.com");
     }
 
     @Test
@@ -144,14 +144,14 @@ class CustomerServiceImplTest {
                 .fullName("Updated Customer")
                 .build();
 
-        when(userRepository.findByPhone("1234567890")).thenReturn(Optional.of(mockCustomer));
+        when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(mockCustomer));
         when(userRepository.existsByEmail("newemail@test.com")).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(mockCustomer);
 
-        UserProfileResponse response = customerService.updateProfile("1234567890", request);
+        UserProfileResponse response = customerService.updateProfile("customer@test.com", request);
 
         assertThat(response).isNotNull();
-        verify(userRepository).findByPhone("1234567890");
+        verify(userRepository).findByEmail("customer@test.com");
         verify(userRepository).existsByEmail("newemail@test.com");
         verify(userRepository).save(mockCustomer);
     }
@@ -167,17 +167,17 @@ class CustomerServiceImplTest {
                 .isDefault(false)
                 .build();
 
-        when(userRepository.findByPhone("1234567890")).thenReturn(Optional.of(mockCustomer));
+        when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(mockCustomer));
         when(addressRepository.save(any(Address.class))).thenReturn(mockAddress);
 
-        AddressResponse response = customerService.createAddress("1234567890", request);
+        AddressResponse response = customerService.createAddress("customer@test.com", request);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
         assertThat(response.getStreet()).isEqualTo("123 Main St");
         assertThat(response.getCity()).isEqualTo("Mumbai");
 
-        verify(userRepository).findByPhone("1234567890");
+        verify(userRepository).findByEmail("customer@test.com");
         verify(addressRepository).save(any(Address.class));
     }
 
@@ -191,19 +191,19 @@ class CustomerServiceImplTest {
                 .notes("Please call before arriving")
                 .build();
 
-        when(userRepository.findByPhone("1234567890")).thenReturn(Optional.of(mockCustomer));
+        when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(mockCustomer));
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(mockService));
         when(addressRepository.findById(1L)).thenReturn(Optional.of(mockAddress));
         when(bookingRepository.save(any(Booking.class))).thenReturn(mockBooking);
 
-        BookingResponse response = customerService.createBooking("1234567890", request);
+        BookingResponse response = customerService.createBooking("customer@test.com", request);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
         assertThat(response.getCustomerId()).isEqualTo(1L);
         assertThat(response.getTotalPrice()).isEqualByComparingTo(BigDecimal.valueOf(500.00));
 
-        verify(userRepository).findByPhone("1234567890");
+        verify(userRepository).findByEmail("customer@test.com");
         verify(serviceRepository).findById(1L);
         verify(addressRepository).findById(1L);
         verify(bookingRepository).save(any(Booking.class));
@@ -216,12 +216,12 @@ class CustomerServiceImplTest {
                 .method("CARD")
                 .build();
 
-        when(userRepository.findByPhone("1234567890")).thenReturn(Optional.of(mockCustomer));
+        when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(mockCustomer));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
         when(paymentRepository.findByBookingId(1L)).thenReturn(Optional.empty());
         when(paymentRepository.save(any(Payment.class))).thenReturn(mockPayment);
 
-        PaymentResponse response = customerService.createPayment("1234567890", request);
+        PaymentResponse response = customerService.createPayment("customer@test.com", request);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
@@ -230,7 +230,7 @@ class CustomerServiceImplTest {
         assertThat(response.getMethod()).isEqualTo("CARD");
         assertThat(response.getStatus()).isEqualTo("PENDING");
 
-        verify(userRepository).findByPhone("1234567890");
+        verify(userRepository).findByEmail("customer@test.com");
         verify(bookingRepository).findById(1L);
         verify(paymentRepository).findByBookingId(1L);
         verify(paymentRepository).save(any(Payment.class));
@@ -238,15 +238,15 @@ class CustomerServiceImplTest {
 
     @Test
     void testConfirmPayment_Success() {
-        when(userRepository.findByPhone("1234567890")).thenReturn(Optional.of(mockCustomer));
+        when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(mockCustomer));
         when(paymentRepository.findById(1L)).thenReturn(Optional.of(mockPayment));
         when(paymentRepository.save(any(Payment.class))).thenReturn(mockPayment);
         when(bookingRepository.save(any(Booking.class))).thenReturn(mockBooking);
 
-        PaymentResponse response = customerService.confirmPayment("1234567890", 1L);
+        PaymentResponse response = customerService.confirmPayment("customer@test.com", 1L);
 
         assertThat(response).isNotNull();
-        verify(userRepository).findByPhone("1234567890");
+        verify(userRepository).findByEmail("customer@test.com");
         verify(paymentRepository).findById(1L);
         verify(paymentRepository).save(mockPayment);
         verify(bookingRepository).save(mockBooking);

@@ -118,68 +118,68 @@ class ExpertServiceImplTest {
 
     @Test
     void testAcceptJob() {
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
         when(bookingRepository.save(any(Booking.class))).thenReturn(mockBooking);
 
-        BookingResponse response = expertService.acceptJob("9876543210", 1L);
+        BookingResponse response = expertService.acceptJob("expert@test.com", 1L);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
         verify(bookingRepository).save(any(Booking.class));
     }
 
     @Test
     void testAcceptJob_ExpertNotFound() {
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> expertService.acceptJob("9876543210", 1L))
+        assertThatThrownBy(() -> expertService.acceptJob("expert@test.com", 1L))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("User not found with phone: 9876543210");
+                .hasMessage("User not found with email: expert@test.com");
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository, never()).findById(any());
     }
 
     @Test
     void testAcceptJob_NotAnExpert() {
-        when(userRepository.findByPhone("1234567890")).thenReturn(Optional.of(mockCustomer));
+        when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(mockCustomer));
 
-        assertThatThrownBy(() -> expertService.acceptJob("1234567890", 1L))
+        assertThatThrownBy(() -> expertService.acceptJob("customer@test.com", 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("User is not an expert");
 
-        verify(userRepository).findByPhone("1234567890");
+        verify(userRepository).findByEmail("customer@test.com");
         verify(bookingRepository, never()).findById(any());
     }
 
     @Test
     void testAcceptJob_BookingNotFound() {
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> expertService.acceptJob("9876543210", 1L))
+        assertThatThrownBy(() -> expertService.acceptJob("expert@test.com", 1L))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Booking not found with ID: 1");
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
     }
 
     @Test
     void testAcceptJob_InvalidStatus() {
         mockBooking.setStatus(Booking.BookingStatus.COMPLETED);
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
 
-        assertThatThrownBy(() -> expertService.acceptJob("9876543210", 1L))
+        assertThatThrownBy(() -> expertService.acceptJob("expert@test.com", 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Booking is not in CONFIRMED status");
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
         verify(bookingRepository, never()).save(any());
     }
@@ -189,30 +189,30 @@ class ExpertServiceImplTest {
         mockBooking.setExpert(mockExpert);
         mockBooking.setStatus(Booking.BookingStatus.ASSIGNED);
 
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
         when(bookingRepository.save(any(Booking.class))).thenReturn(mockBooking);
 
-        BookingResponse response = expertService.declineJob("9876543210", 1L);
+        BookingResponse response = expertService.declineJob("expert@test.com", 1L);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
         verify(bookingRepository).save(any(Booking.class));
     }
 
     @Test
     void testDeclineJob_NotAssignedToExpert() {
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
 
-        assertThatThrownBy(() -> expertService.declineJob("9876543210", 1L))
+        assertThatThrownBy(() -> expertService.declineJob("expert@test.com", 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Booking is not assigned to this expert");
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
         verify(bookingRepository, never()).save(any());
     }
@@ -222,30 +222,30 @@ class ExpertServiceImplTest {
         mockBooking.setExpert(mockExpert);
         mockBooking.setStatus(Booking.BookingStatus.ASSIGNED);
 
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
         when(bookingRepository.save(any(Booking.class))).thenReturn(mockBooking);
 
-        BookingResponse response = expertService.startJob("9876543210", 1L);
+        BookingResponse response = expertService.startJob("expert@test.com", 1L);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
         verify(bookingRepository).save(any(Booking.class));
     }
 
     @Test
     void testStartJob_NotAssignedToExpert() {
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
 
-        assertThatThrownBy(() -> expertService.startJob("9876543210", 1L))
+        assertThatThrownBy(() -> expertService.startJob("expert@test.com", 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Booking is not assigned to this expert");
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
         verify(bookingRepository, never()).save(any());
     }
@@ -255,14 +255,14 @@ class ExpertServiceImplTest {
         mockBooking.setExpert(mockExpert);
         mockBooking.setStatus(Booking.BookingStatus.COMPLETED);
 
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
 
-        assertThatThrownBy(() -> expertService.startJob("9876543210", 1L))
+        assertThatThrownBy(() -> expertService.startJob("expert@test.com", 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Booking is not in ASSIGNED status");
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
         verify(bookingRepository, never()).save(any());
     }
@@ -272,16 +272,16 @@ class ExpertServiceImplTest {
         mockBooking.setExpert(mockExpert);
         mockBooking.setStatus(Booking.BookingStatus.IN_PROGRESS);
 
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
         when(bookingRepository.save(any(Booking.class))).thenReturn(mockBooking);
 
-        BookingResponse response = expertService.completeJob("9876543210", 1L);
+        BookingResponse response = expertService.completeJob("expert@test.com", 1L);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
         verify(bookingRepository).save(any(Booking.class));
     }
@@ -290,14 +290,14 @@ class ExpertServiceImplTest {
     void testCompleteJob_NotAssignedToExpert() {
         mockBooking.setStatus(Booking.BookingStatus.IN_PROGRESS);
 
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
 
-        assertThatThrownBy(() -> expertService.completeJob("9876543210", 1L))
+        assertThatThrownBy(() -> expertService.completeJob("expert@test.com", 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Booking is not assigned to this expert");
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
         verify(bookingRepository, never()).save(any());
     }
@@ -307,14 +307,14 @@ class ExpertServiceImplTest {
         mockBooking.setExpert(mockExpert);
         mockBooking.setStatus(Booking.BookingStatus.ASSIGNED);
 
-        when(userRepository.findByPhone("9876543210")).thenReturn(Optional.of(mockExpert));
+        when(userRepository.findByEmail("expert@test.com")).thenReturn(Optional.of(mockExpert));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(mockBooking));
 
-        assertThatThrownBy(() -> expertService.completeJob("9876543210", 1L))
+        assertThatThrownBy(() -> expertService.completeJob("expert@test.com", 1L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Booking is not in IN_PROGRESS status");
 
-        verify(userRepository).findByPhone("9876543210");
+        verify(userRepository).findByEmail("expert@test.com");
         verify(bookingRepository).findById(1L);
         verify(bookingRepository, never()).save(any());
     }
