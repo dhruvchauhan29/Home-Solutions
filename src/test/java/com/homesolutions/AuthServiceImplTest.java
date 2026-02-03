@@ -5,9 +5,11 @@ import com.homesolutions.dto.AdminRegisterRequest;
 import com.homesolutions.dto.AuthResponse;
 import com.homesolutions.dto.LoginRequest;
 import com.homesolutions.dto.RegisterRequest;
+import com.homesolutions.entity.Admin;
 import com.homesolutions.entity.User;
 import com.homesolutions.exception.BusinessException;
 import com.homesolutions.exception.ResourceNotFoundException;
+import com.homesolutions.repository.AdminRepository;
 import com.homesolutions.repository.UserRepository;
 import com.homesolutions.security.JwtUtil;
 import com.homesolutions.service.impl.AuthServiceImpl;
@@ -34,6 +36,9 @@ class AuthServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private AdminRepository adminRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -211,22 +216,18 @@ class AuthServiceImplTest {
                 .password("password123")
                 .build();
 
-        Set<String> adminRoles = new HashSet<>();
-        adminRoles.add("ROLE_ADMIN");
-
-        User adminUser = User.builder()
+        Admin mockAdmin = Admin.builder()
                 .id(3L)
                 .email("admin@test.com")
                 .fullName("Test Admin")
                 .password("encodedPassword")
-                .roles(adminRoles)
                 .enabled(true)
                 .build();
 
-        when(userRepository.existsByEmail(adminRegisterRequest.getEmail())).thenReturn(false);
+        when(adminRepository.existsByEmail(adminRegisterRequest.getEmail())).thenReturn(false);
         when(passwordEncoder.encode(adminRegisterRequest.getPassword())).thenReturn("encodedPassword");
-        when(userRepository.save(any(User.class))).thenReturn(adminUser);
-        when(jwtUtil.generateToken(adminUser.getEmail())).thenReturn("jwt-token-admin");
+        when(adminRepository.save(any(Admin.class))).thenReturn(mockAdmin);
+        when(jwtUtil.generateToken(mockAdmin.getEmail())).thenReturn("jwt-token-admin");
 
         AuthResponse response = authService.registerAdmin(adminRegisterRequest);
 
@@ -237,10 +238,10 @@ class AuthServiceImplTest {
         assertThat(response.getEmail()).isEqualTo("admin@test.com");
         assertThat(response.getRoles()).contains("ROLE_ADMIN");
 
-        verify(userRepository).existsByEmail(adminRegisterRequest.getEmail());
+        verify(adminRepository).existsByEmail(adminRegisterRequest.getEmail());
         verify(passwordEncoder).encode(adminRegisterRequest.getPassword());
-        verify(userRepository).save(any(User.class));
-        verify(jwtUtil).generateToken(adminUser.getEmail());
+        verify(adminRepository).save(any(Admin.class));
+        verify(jwtUtil).generateToken(mockAdmin.getEmail());
     }
 
     @Test
@@ -251,14 +252,14 @@ class AuthServiceImplTest {
                 .password("password123")
                 .build();
 
-        when(userRepository.existsByEmail(adminRegisterRequest.getEmail())).thenReturn(true);
+        when(adminRepository.existsByEmail(adminRegisterRequest.getEmail())).thenReturn(true);
 
         assertThatThrownBy(() -> authService.registerAdmin(adminRegisterRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Email already registered");
 
-        verify(userRepository).existsByEmail(adminRegisterRequest.getEmail());
-        verify(userRepository, never()).save(any(User.class));
+        verify(adminRepository).existsByEmail(adminRegisterRequest.getEmail());
+        verify(adminRepository, never()).save(any(Admin.class));
     }
 
     @Test
@@ -268,21 +269,17 @@ class AuthServiceImplTest {
                 .password("password123")
                 .build();
 
-        Set<String> adminRoles = new HashSet<>();
-        adminRoles.add("ROLE_ADMIN");
-
-        User adminUser = User.builder()
+        Admin mockAdmin = Admin.builder()
                 .id(3L)
                 .email("admin@test.com")
                 .fullName("Test Admin")
                 .password("encodedPassword")
-                .roles(adminRoles)
                 .enabled(true)
                 .build();
 
-        when(userRepository.findByEmail(adminLoginRequest.getEmail())).thenReturn(Optional.of(adminUser));
-        when(passwordEncoder.matches(adminLoginRequest.getPassword(), adminUser.getPassword())).thenReturn(true);
-        when(jwtUtil.generateToken(adminUser.getEmail())).thenReturn("jwt-token-admin");
+        when(adminRepository.findByEmail(adminLoginRequest.getEmail())).thenReturn(Optional.of(mockAdmin));
+        when(passwordEncoder.matches(adminLoginRequest.getPassword(), mockAdmin.getPassword())).thenReturn(true);
+        when(jwtUtil.generateToken(mockAdmin.getEmail())).thenReturn("jwt-token-admin");
 
         AuthResponse response = authService.loginAdmin(adminLoginRequest);
 
@@ -293,9 +290,9 @@ class AuthServiceImplTest {
         assertThat(response.getEmail()).isEqualTo("admin@test.com");
         assertThat(response.getRoles()).contains("ROLE_ADMIN");
 
-        verify(userRepository).findByEmail(adminLoginRequest.getEmail());
-        verify(passwordEncoder).matches(adminLoginRequest.getPassword(), adminUser.getPassword());
-        verify(jwtUtil).generateToken(adminUser.getEmail());
+        verify(adminRepository).findByEmail(adminLoginRequest.getEmail());
+        verify(passwordEncoder).matches(adminLoginRequest.getPassword(), mockAdmin.getPassword());
+        verify(jwtUtil).generateToken(mockAdmin.getEmail());
     }
 
     @Test
@@ -305,13 +302,13 @@ class AuthServiceImplTest {
                 .password("password123")
                 .build();
 
-        when(userRepository.findByEmail(adminLoginRequest.getEmail())).thenReturn(Optional.of(mockUser));
+        when(adminRepository.findByEmail(adminLoginRequest.getEmail())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> authService.loginAdmin(adminLoginRequest))
-                .isInstanceOf(BusinessException.class)
-                .hasMessage("User is not an admin");
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Admin not found with email:");
 
-        verify(userRepository).findByEmail(adminLoginRequest.getEmail());
+        verify(adminRepository).findByEmail(adminLoginRequest.getEmail());
         verify(passwordEncoder, never()).matches(anyString(), anyString());
         verify(jwtUtil, never()).generateToken(anyString());
     }
@@ -323,27 +320,23 @@ class AuthServiceImplTest {
                 .password("wrongpassword")
                 .build();
 
-        Set<String> adminRoles = new HashSet<>();
-        adminRoles.add("ROLE_ADMIN");
-
-        User adminUser = User.builder()
+        Admin mockAdmin = Admin.builder()
                 .id(3L)
                 .email("admin@test.com")
                 .fullName("Test Admin")
                 .password("encodedPassword")
-                .roles(adminRoles)
                 .enabled(true)
                 .build();
 
-        when(userRepository.findByEmail(adminLoginRequest.getEmail())).thenReturn(Optional.of(adminUser));
-        when(passwordEncoder.matches(adminLoginRequest.getPassword(), adminUser.getPassword())).thenReturn(false);
+        when(adminRepository.findByEmail(adminLoginRequest.getEmail())).thenReturn(Optional.of(mockAdmin));
+        when(passwordEncoder.matches(adminLoginRequest.getPassword(), mockAdmin.getPassword())).thenReturn(false);
 
         assertThatThrownBy(() -> authService.loginAdmin(adminLoginRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage("Invalid credentials");
 
-        verify(userRepository).findByEmail(adminLoginRequest.getEmail());
-        verify(passwordEncoder).matches(adminLoginRequest.getPassword(), adminUser.getPassword());
+        verify(adminRepository).findByEmail(adminLoginRequest.getEmail());
+        verify(passwordEncoder).matches(adminLoginRequest.getPassword(), mockAdmin.getPassword());
         verify(jwtUtil, never()).generateToken(anyString());
     }
 }

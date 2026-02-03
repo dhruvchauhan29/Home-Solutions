@@ -59,8 +59,33 @@ com.homesolutions
 - **Method-level Security** - `@PreAuthorize` on secured endpoints
 - **Proper HTTP Status Codes** - 401 Unauthorized, 403 Forbidden
 - **DEBUG Logging** - Comprehensive debug-level logging for troubleshooting
+- **Separate Admin Table** - Admins are stored in a dedicated `admins` table, while customers and experts are stored in the `users` table
 
 ## 📊 Database Setup
+
+### Database Schema
+
+The application uses two main tables for authentication:
+
+1. **`users` table** - Stores customers and experts
+   - `id` (Primary Key)
+   - `email` (Unique, NOT NULL)
+   - `full_name` (NOT NULL)
+   - `password` (NOT NULL)
+   - `phone` (Nullable - optional field)
+   - `enabled` (Boolean)
+   - `created_at`, `updated_at`
+   - Associated `user_roles` table for role management
+
+2. **`admins` table** - Stores admin users separately
+   - `id` (Primary Key)
+   - `email` (Unique, NOT NULL)
+   - `full_name` (NOT NULL)
+   - `password` (NOT NULL)
+   - `enabled` (Boolean)
+   - `created_at`, `updated_at`
+
+This separation ensures clean data management and prevents schema conflicts between different user types.
 
 ### PostgreSQL Setup
 
@@ -83,9 +108,10 @@ The application seeds initial data on startup:
 - 8 service categories
 - 32 services across all categories
 - Default admin user:
-  - Email: `admin@example.com`
+  - Email: `admin@homesolutions.com`
   - Password: `admin123`
   - Role: `ROLE_ADMIN`
+  - **Note**: Admin users are stored in the `admins` table
 
 ## 🚀 Run Instructions
 
@@ -114,9 +140,16 @@ http://localhost:8080/swagger-ui.html
 
 ## 🔄 JWT Authentication Flow
 
-Authentication uses **email + password** (not phone).
+Authentication uses **email + password** (phone is optional).
 
-### 1. Register a User
+### Authentication Architecture
+
+- **Customers & Experts**: Authenticate using the `users` table via `/auth/register` and `/auth/login`
+- **Admins**: Authenticate using the `admins` table via `/auth/admin/register` and `/auth/admin/login`
+- **JWT Token**: Both user types receive the same JWT token format containing email and roles
+- **UserDetailsService**: Automatically checks both `admins` and `users` tables during authentication
+
+### 1. Register a User (Customer or Expert)
 ```bash
 curl -X POST http://localhost:8080/auth/register \
   -H "Content-Type: application/json" \
@@ -124,9 +157,12 @@ curl -X POST http://localhost:8080/auth/register \
     "email": "customer@example.com",
     "fullName": "John Doe",
     "password": "password123",
+    "phone": "1234567890",
     "role": "CUSTOMER"
   }'
 ```
+
+**Note**: The `phone` field is optional and can be omitted.
 
 Response:
 ```json
@@ -151,6 +187,8 @@ curl -X POST http://localhost:8080/auth/login \
 ```
 
 ### 3. Admin Registration
+**Note**: Admin users are stored in a separate `admins` table, not in the `users` table.
+
 ```bash
 curl -X POST http://localhost:8080/auth/admin/register \
   -H "Content-Type: application/json" \
@@ -441,6 +479,8 @@ Error Codes:
 - `UNAUTHORIZED` (401)
 - `FORBIDDEN` (403)
 - `VALIDATION_ERROR` (400)
+- `DUPLICATE_EMAIL` (409) - Email already exists in database
+- `DUPLICATE_PHONE` (409) - Phone number already exists in database
 - `INTERNAL_SERVER_ERROR` (500)
 
 ## 📋 Requirements Checklist

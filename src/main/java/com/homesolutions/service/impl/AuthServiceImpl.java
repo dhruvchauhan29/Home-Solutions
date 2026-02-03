@@ -5,9 +5,11 @@ import com.homesolutions.dto.AdminRegisterRequest;
 import com.homesolutions.dto.AuthResponse;
 import com.homesolutions.dto.LoginRequest;
 import com.homesolutions.dto.RegisterRequest;
+import com.homesolutions.entity.Admin;
 import com.homesolutions.entity.User;
 import com.homesolutions.exception.BusinessException;
 import com.homesolutions.exception.ResourceNotFoundException;
+import com.homesolutions.repository.AdminRepository;
 import com.homesolutions.repository.UserRepository;
 import com.homesolutions.security.JwtUtil;
 import com.homesolutions.service.interfaces.AuthService;
@@ -26,6 +28,7 @@ import java.util.Set;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
@@ -126,36 +129,34 @@ public class AuthServiceImpl implements AuthService {
         log.debug("Admin registration request details - email: {}, fullName: {}", 
                 request.getEmail(), request.getFullName());
 
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (adminRepository.existsByEmail(request.getEmail())) {
             log.debug("Admin registration failed - Email already registered: {}", request.getEmail());
             throw new BusinessException("Email already registered");
         }
 
-        Set<String> roles = new HashSet<>();
-        roles.add("ROLE_ADMIN");
-        log.debug("Assigning ROLE_ADMIN to user");
-
-        User user = User.builder()
+        Admin admin = Admin.builder()
                 .email(request.getEmail())
                 .fullName(request.getFullName())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roles(roles)
                 .enabled(true)
                 .build();
 
-        user = userRepository.save(user);
-        log.info("Admin registered successfully with ID: {}", user.getId());
-        log.debug("Admin details - ID: {}, email: {}, roles: {}", user.getId(), user.getEmail(), user.getRoles());
+        admin = adminRepository.save(admin);
+        log.info("Admin registered successfully with ID: {}", admin.getId());
+        log.debug("Admin details - ID: {}, email: {}", admin.getId(), admin.getEmail());
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(admin.getEmail());
+
+        Set<String> roles = new HashSet<>();
+        roles.add("ROLE_ADMIN");
 
         return AuthResponse.builder()
                 .token(token)
                 .type("Bearer")
-                .userId(user.getId())
-                .email(user.getEmail())
-                .fullName(user.getFullName())
-                .roles(user.getRoles())
+                .userId(admin.getId())
+                .email(admin.getEmail())
+                .fullName(admin.getFullName())
+                .roles(roles)
                 .build();
     }
 
@@ -165,41 +166,39 @@ public class AuthServiceImpl implements AuthService {
         log.info("Admin login attempt for email: {}", request.getEmail());
         log.debug("Processing admin login request for email: {}", request.getEmail());
 
-        User user = userRepository.findByEmail(request.getEmail())
+        Admin admin = adminRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> {
-                    log.debug("Admin login failed - User not found with email: {}", request.getEmail());
-                    return new ResourceNotFoundException("User not found with email: " + request.getEmail());
+                    log.debug("Admin login failed - Admin not found with email: {}", request.getEmail());
+                    return new ResourceNotFoundException("Admin not found with email: " + request.getEmail());
                 });
 
-        log.debug("User found - ID: {}, enabled: {}, roles: {}", user.getId(), user.getEnabled(), user.getRoles());
+        log.debug("Admin found - ID: {}, enabled: {}", admin.getId(), admin.getEnabled());
 
-        if (!user.getRoles().contains("ROLE_ADMIN")) {
-            log.debug("Admin login failed - User does not have ROLE_ADMIN: {}", request.getEmail());
-            throw new BusinessException("User is not an admin");
-        }
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
             log.debug("Admin login failed - Invalid credentials for email: {}", request.getEmail());
             throw new BusinessException("Invalid credentials");
         }
 
-        if (!user.getEnabled()) {
+        if (!admin.getEnabled()) {
             log.debug("Admin login failed - Account disabled for email: {}", request.getEmail());
             throw new BusinessException("Account is disabled");
         }
 
-        log.info("Admin logged in successfully: {}", user.getEmail());
-        log.debug("Generating JWT token for admin ID: {}", user.getId());
+        log.info("Admin logged in successfully: {}", admin.getEmail());
+        log.debug("Generating JWT token for admin ID: {}", admin.getId());
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(admin.getEmail());
+
+        Set<String> roles = new HashSet<>();
+        roles.add("ROLE_ADMIN");
 
         return AuthResponse.builder()
                 .token(token)
                 .type("Bearer")
-                .userId(user.getId())
-                .email(user.getEmail())
-                .fullName(user.getFullName())
-                .roles(user.getRoles())
+                .userId(admin.getId())
+                .email(admin.getEmail())
+                .fullName(admin.getFullName())
+                .roles(roles)
                 .build();
     }
 }

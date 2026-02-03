@@ -123,6 +123,34 @@ class AuthControllerTest {
     }
 
     @Test
+    void testRegister_WithoutPhone_Success() throws Exception {
+        RegisterRequest requestWithoutPhone = RegisterRequest.builder()
+                .email("nophone@example.com")
+                .fullName("User Without Phone")
+                .password("password123")
+                .role("CUSTOMER")
+                .build();
+
+        AuthResponse responseWithoutPhone = AuthResponse.builder()
+                .token("jwt-token-456")
+                .type("Bearer")
+                .userId(3L)
+                .email("nophone@example.com")
+                .fullName("User Without Phone")
+                .roles(Set.of("ROLE_CUSTOMER"))
+                .build();
+
+        when(authService.register(any(RegisterRequest.class))).thenReturn(responseWithoutPhone);
+
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestWithoutPhone)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.token").value("jwt-token-456"))
+                .andExpect(jsonPath("$.email").value("nophone@example.com"));
+    }
+
+    @Test
     void testRegisterAdmin_Success() throws Exception {
         AdminRegisterRequest adminRegisterRequest = AdminRegisterRequest.builder()
                 .email("admin@example.com")

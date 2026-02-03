@@ -66,8 +66,5 @@ INSERT INTO services (name, description, category_id, base_price, extra_hourly_r
 ('AC Gas Refilling', 'Refill AC gas for optimal cooling', 8, 800.00, 90.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert Admin User (password: admin123)
-INSERT INTO users (phone, email, full_name, password, enabled, created_at, updated_at) VALUES
-('9999999999', 'admin@homesolutions.com', 'Admin User', '$2a$10$xQ5Z8qYqQYqYqYqYqYqYqOqYqYqYqYqYqYqYqYqYqYqYqYqYqYqYq', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-INSERT INTO user_roles (user_id, role) VALUES
-((SELECT id FROM users WHERE phone = '9999999999'), 'ROLE_ADMIN');
+INSERT INTO admins (email, full_name, password, enabled, created_at, updated_at) VALUES
+('admin@homesolutions.com', 'Admin User', '$2a$10$xQ5Z8qYqQYqYqYqYqYqYqOqYqYqYqYqYqYqYqYqYqYqYqYqYqYqYq', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

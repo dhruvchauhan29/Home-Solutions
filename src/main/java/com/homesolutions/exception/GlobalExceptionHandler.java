@@ -3,6 +3,7 @@ package com.homesolutions.exception;
 import com.homesolutions.dto.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -91,6 +92,23 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        logger.error("Data integrity violation: {}", ex.getMessage());
+        String message = "Email already exists";
+        String code = "DUPLICATE_EMAIL";
+        if (ex.getMessage() != null && ex.getMessage().contains("phone")) {
+            message = "Phone number already exists";
+            code = "DUPLICATE_PHONE";
+        }
+        ErrorResponse error = ErrorResponse.builder()
+                .code(code)
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)

@@ -50,6 +50,7 @@
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/repository/RatingRepository.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/exception/ResourceNotFoundException.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/dto/ServiceResponse.java
+/home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/entity/Admin.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/service/impl/ServiceManagementServiceImpl.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/entity/Address.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/service/impl/AdminServiceImpl.java
@@ -75,4 +76,5 @@
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/dto/RegisterRequest.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/security/JwtUtil.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/dto/BookingResponse.java
+/home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/repository/AdminRepository.java
 /home/runner/work/Home-Solutions/Home-Solutions/src/main/java/com/homesolutions/dto/TicketRequest.java
