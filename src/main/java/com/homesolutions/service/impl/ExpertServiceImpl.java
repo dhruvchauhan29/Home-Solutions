@@ -277,15 +277,6 @@ public class ExpertServiceImpl implements ExpertService {
                 .build();
     }
 
-    private CategoryResponse mapToCategoryResponse(Category category) {
-        return CategoryResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .description(category.getDescription())
-                .active(category.getActive())
-                .build();
-    }
-
     private AddressResponse mapToAddressResponse(Address address) {
         return AddressResponse.builder()
                 .id(address.getId())

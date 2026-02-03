@@ -83,13 +83,4 @@ public class ServiceManagementServiceImpl implements ServiceManagementService {
                 .createdAt(service.getCreatedAt())
                 .build();
     }
-
-    private CategoryResponse mapToCategoryResponse(Category category) {
-        return CategoryResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .description(category.getDescription())
-                .active(category.getActive())
-                .build();
-    }
 }
