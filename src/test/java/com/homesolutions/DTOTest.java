@@ -21,7 +21,7 @@ class DTOTest {
                 .token("jwt-token")
                 .type("Bearer")
                 .userId(1L)
-                .phone("1234567890")
+                .email("test@example.com")
                 .fullName("Test User")
                 .roles(roles)
                 .build();
@@ -29,7 +29,7 @@ class DTOTest {
         assertThat(response.getToken()).isEqualTo("jwt-token");
         assertThat(response.getType()).isEqualTo("Bearer");
         assertThat(response.getUserId()).isEqualTo(1L);
-        assertThat(response.getPhone()).isEqualTo("1234567890");
+        assertThat(response.getEmail()).isEqualTo("test@example.com");
         assertThat(response.getFullName()).isEqualTo("Test User");
         assertThat(response.getRoles()).contains("ROLE_CUSTOMER");
     }
@@ -37,11 +37,11 @@ class DTOTest {
     @Test
     void testLoginRequest() {
         LoginRequest request = LoginRequest.builder()
-                .phone("1234567890")
+                .email("test@example.com")
                 .password("password123")
                 .build();
 
-        assertThat(request.getPhone()).isEqualTo("1234567890");
+        assertThat(request.getEmail()).isEqualTo("test@example.com");
         assertThat(request.getPassword()).isEqualTo("password123");
     }
 
@@ -60,6 +60,30 @@ class DTOTest {
         assertThat(request.getFullName()).isEqualTo("Test User");
         assertThat(request.getPassword()).isEqualTo("password123");
         assertThat(request.getRole()).isEqualTo("CUSTOMER");
+    }
+
+    @Test
+    void testAdminRegisterRequest() {
+        AdminRegisterRequest request = AdminRegisterRequest.builder()
+                .email("admin@example.com")
+                .fullName("Test Admin")
+                .password("password123")
+                .build();
+
+        assertThat(request.getEmail()).isEqualTo("admin@example.com");
+        assertThat(request.getFullName()).isEqualTo("Test Admin");
+        assertThat(request.getPassword()).isEqualTo("password123");
+    }
+
+    @Test
+    void testAdminLoginRequest() {
+        AdminLoginRequest request = AdminLoginRequest.builder()
+                .email("admin@example.com")
+                .password("password123")
+                .build();
+
+        assertThat(request.getEmail()).isEqualTo("admin@example.com");
+        assertThat(request.getPassword()).isEqualTo("password123");
     }
 
     @Test

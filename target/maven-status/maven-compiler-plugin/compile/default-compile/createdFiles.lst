@@ -16,7 +16,9 @@ com/homesolutions/dto/AddressResponse$AddressResponseBuilder.class
 com/homesolutions/entity/Payment$PaymentMethod.class
 com/homesolutions/dto/PaymentResponse.class
 com/homesolutions/controller/PricingController.class
+com/homesolutions/dto/AdminLoginRequest.class
 com/homesolutions/mapper/CategoryMapper.class
+com/homesolutions/dto/AdminRegisterRequest$AdminRegisterRequestBuilder.class
 com/homesolutions/dto/UserProfileResponse.class
 com/homesolutions/service/interfaces/PricingService.class
 com/homesolutions/entity/Category.class
@@ -85,6 +87,8 @@ com/homesolutions/dto/QuoteRequest$QuoteRequestBuilder.class
 com/homesolutions/entity/Ticket$TicketPriority.class
 com/homesolutions/exception/UnauthorizedException.class
 com/homesolutions/dto/ServiceResponse$ServiceResponseBuilder.class
+com/homesolutions/dto/AdminRegisterRequest.class
+com/homesolutions/dto/AdminLoginRequest$AdminLoginRequestBuilder.class
 com/homesolutions/entity/Booking.class
 com/homesolutions/repository/UserRepository.class
 com/homesolutions/service/impl/CustomerServiceImpl.class

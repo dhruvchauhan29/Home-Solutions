@@ -2,6 +2,8 @@ package com.homesolutions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.homesolutions.controller.AuthController;
+import com.homesolutions.dto.AdminLoginRequest;
+import com.homesolutions.dto.AdminRegisterRequest;
 import com.homesolutions.dto.AuthResponse;
 import com.homesolutions.dto.LoginRequest;
 import com.homesolutions.dto.RegisterRequest;
@@ -52,7 +54,6 @@ class AuthControllerTest {
     @BeforeEach
     void setUp() {
         registerRequest = RegisterRequest.builder()
-                .phone("1234567890")
                 .email("test@example.com")
                 .fullName("Test User")
                 .password("password123")
@@ -60,7 +61,7 @@ class AuthControllerTest {
                 .build();
 
         loginRequest = LoginRequest.builder()
-                .phone("1234567890")
+                .email("test@example.com")
                 .password("password123")
                 .build();
 
@@ -71,7 +72,7 @@ class AuthControllerTest {
                 .token("jwt-token-123")
                 .type("Bearer")
                 .userId(1L)
-                .phone("1234567890")
+                .email("test@example.com")
                 .fullName("Test User")
                 .roles(roles)
                 .build();
@@ -88,7 +89,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.token").value("jwt-token-123"))
                 .andExpect(jsonPath("$.type").value("Bearer"))
                 .andExpect(jsonPath("$.userId").value(1))
-                .andExpect(jsonPath("$.phone").value("1234567890"))
+                .andExpect(jsonPath("$.email").value("test@example.com"))
                 .andExpect(jsonPath("$.fullName").value("Test User"));
     }
 
@@ -103,14 +104,13 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.token").value("jwt-token-123"))
                 .andExpect(jsonPath("$.type").value("Bearer"))
                 .andExpect(jsonPath("$.userId").value(1))
-                .andExpect(jsonPath("$.phone").value("1234567890"));
+                .andExpect(jsonPath("$.email").value("test@example.com"));
     }
 
     @Test
     void testRegister_ValidationError() throws Exception {
         RegisterRequest invalidRequest = RegisterRequest.builder()
-                .phone("123")
-                .email("test@example.com")
+                .email("invalid-email")
                 .fullName("T")
                 .password("123")
                 .role("CUSTOMER")
@@ -120,5 +120,69 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterAdmin_Success() throws Exception {
+        AdminRegisterRequest adminRegisterRequest = AdminRegisterRequest.builder()
+                .email("admin@example.com")
+                .fullName("Test Admin")
+                .password("password123")
+                .build();
+
+        Set<String> adminRoles = new HashSet<>();
+        adminRoles.add("ROLE_ADMIN");
+
+        AuthResponse adminResponse = AuthResponse.builder()
+                .token("jwt-admin-token-123")
+                .type("Bearer")
+                .userId(2L)
+                .email("admin@example.com")
+                .fullName("Test Admin")
+                .roles(adminRoles)
+                .build();
+
+        when(authService.registerAdmin(any(AdminRegisterRequest.class))).thenReturn(adminResponse);
+
+        mockMvc.perform(post("/auth/admin/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(adminRegisterRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.token").value("jwt-admin-token-123"))
+                .andExpect(jsonPath("$.type").value("Bearer"))
+                .andExpect(jsonPath("$.userId").value(2))
+                .andExpect(jsonPath("$.email").value("admin@example.com"))
+                .andExpect(jsonPath("$.fullName").value("Test Admin"));
+    }
+
+    @Test
+    void testLoginAdmin_Success() throws Exception {
+        AdminLoginRequest adminLoginRequest = AdminLoginRequest.builder()
+                .email("admin@example.com")
+                .password("password123")
+                .build();
+
+        Set<String> adminRoles = new HashSet<>();
+        adminRoles.add("ROLE_ADMIN");
+
+        AuthResponse adminResponse = AuthResponse.builder()
+                .token("jwt-admin-token-123")
+                .type("Bearer")
+                .userId(2L)
+                .email("admin@example.com")
+                .fullName("Test Admin")
+                .roles(adminRoles)
+                .build();
+
+        when(authService.loginAdmin(any(AdminLoginRequest.class))).thenReturn(adminResponse);
+
+        mockMvc.perform(post("/auth/admin/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(adminLoginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("jwt-admin-token-123"))
+                .andExpect(jsonPath("$.type").value("Bearer"))
+                .andExpect(jsonPath("$.userId").value(2))
+                .andExpect(jsonPath("$.email").value("admin@example.com"));
     }
 }

@@ -53,11 +53,12 @@ com.homesolutions
 
 ## 🔐 Security Features
 
-- **JWT Authentication** - Stateless token-based authentication
+- **JWT Authentication** - Stateless token-based authentication with email + password
 - **BCrypt Password Hashing** - Secure password storage
 - **Role-Based Authorization** - Three roles: `ROLE_CUSTOMER`, `ROLE_EXPERT`, `ROLE_ADMIN`
 - **Method-level Security** - `@PreAuthorize` on secured endpoints
 - **Proper HTTP Status Codes** - 401 Unauthorized, 403 Forbidden
+- **DEBUG Logging** - Comprehensive debug-level logging for troubleshooting
 
 ## 📊 Database Setup
 
@@ -82,7 +83,7 @@ The application seeds initial data on startup:
 - 8 service categories
 - 32 services across all categories
 - Default admin user:
-  - Phone: `9999999999`
+  - Email: `admin@example.com`
   - Password: `admin123`
   - Role: `ROLE_ADMIN`
 
@@ -113,12 +114,13 @@ http://localhost:8080/swagger-ui.html
 
 ## 🔄 JWT Authentication Flow
 
+Authentication uses **email + password** (not phone).
+
 ### 1. Register a User
 ```bash
 curl -X POST http://localhost:8080/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "phone": "9876543210",
     "email": "customer@example.com",
     "fullName": "John Doe",
     "password": "password123",
@@ -132,7 +134,7 @@ Response:
   "token": "eyJhbGciOiJIUzI1NiJ9...",
   "type": "Bearer",
   "userId": 1,
-  "phone": "9876543210",
+  "email": "customer@example.com",
   "fullName": "John Doe",
   "roles": ["ROLE_CUSTOMER"]
 }
@@ -143,12 +145,33 @@ Response:
 curl -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "phone": "9876543210",
+    "email": "customer@example.com",
     "password": "password123"
   }'
 ```
 
-### 3. Use Token for Authenticated Requests
+### 3. Admin Registration
+```bash
+curl -X POST http://localhost:8080/auth/admin/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@example.com",
+    "fullName": "Admin User",
+    "password": "admin123"
+  }'
+```
+
+### 4. Admin Login
+```bash
+curl -X POST http://localhost:8080/auth/admin/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@example.com",
+    "password": "admin123"
+  }'
+```
+
+### 5. Use Token for Authenticated Requests
 ```bash
 curl -X GET http://localhost:8080/customer/profile \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9..."
@@ -369,8 +392,10 @@ main
 
 ### Public Endpoints
 - `GET /health` - Health check
-- `POST /auth/register` - Register user
-- `POST /auth/login` - Login
+- `POST /auth/register` - Register user (customer or expert)
+- `POST /auth/login` - Login user
+- `POST /auth/admin/register` - Register admin
+- `POST /auth/admin/login` - Login admin
 - `GET /services` - Browse services
 - `GET /pricing/quote` - Get price quote
 
