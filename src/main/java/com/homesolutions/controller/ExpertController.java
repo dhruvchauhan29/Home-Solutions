@@ -33,7 +33,7 @@ public class ExpertController {
 
     private final ExpertService expertService;
 
-    private String getAuthenticatedPhone() {
+    private String getAuthenticatedEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
     }
@@ -41,10 +41,10 @@ public class ExpertController {
     @PostMapping("/onboarding")
     @Operation(summary = "Expert onboarding", description = "Submit expert onboarding details")
     public ResponseEntity<UserProfileResponse> onboard(@RequestBody Map<String, String> request) {
-        String phone = getAuthenticatedPhone();
+        String email = getAuthenticatedEmail();
         String details = request.getOrDefault("details", "");
-        log.info("Expert onboarding for phone: {}", phone);
-        UserProfileResponse profile = expertService.onboard(phone, details);
+        log.info("Expert onboarding for email: {}", email);
+        UserProfileResponse profile = expertService.onboard(email, details);
         return ResponseEntity.status(HttpStatus.CREATED).body(profile);
     }
 
@@ -55,55 +55,55 @@ public class ExpertController {
             @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size")
             @RequestParam(defaultValue = "10") int size) {
-        String phone = getAuthenticatedPhone();
-        log.info("Get jobs for expert: {}, page: {}, size: {}", phone, page, size);
+        String email = getAuthenticatedEmail();
+        log.info("Get jobs for expert: {}, page: {}, size: {}", email, page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<BookingResponse> jobs = expertService.getJobs(phone, pageable);
+        Page<BookingResponse> jobs = expertService.getJobs(email, pageable);
         return ResponseEntity.ok(jobs);
     }
 
     @PostMapping("/jobs/{bookingId}/accept")
     @Operation(summary = "Accept job", description = "Accept an assigned job")
     public ResponseEntity<BookingResponse> acceptJob(@PathVariable Long bookingId) {
-        String phone = getAuthenticatedPhone();
-        log.info("Expert {} accepting job {}", phone, bookingId);
-        BookingResponse booking = expertService.acceptJob(phone, bookingId);
+        String email = getAuthenticatedEmail();
+        log.info("Expert {} accepting job {}", email, bookingId);
+        BookingResponse booking = expertService.acceptJob(email, bookingId);
         return ResponseEntity.ok(booking);
     }
 
     @PostMapping("/jobs/{bookingId}/decline")
     @Operation(summary = "Decline job", description = "Decline an assigned job")
     public ResponseEntity<BookingResponse> declineJob(@PathVariable Long bookingId) {
-        String phone = getAuthenticatedPhone();
-        log.info("Expert {} declining job {}", phone, bookingId);
-        BookingResponse booking = expertService.declineJob(phone, bookingId);
+        String email = getAuthenticatedEmail();
+        log.info("Expert {} declining job {}", email, bookingId);
+        BookingResponse booking = expertService.declineJob(email, bookingId);
         return ResponseEntity.ok(booking);
     }
 
     @PostMapping("/jobs/{bookingId}/arrived")
     @Operation(summary = "Mark arrived", description = "Mark that the expert has arrived at the job location")
     public ResponseEntity<BookingResponse> arrivedAtJob(@PathVariable Long bookingId) {
-        String phone = getAuthenticatedPhone();
-        log.info("Expert {} arrived at job {}", phone, bookingId);
-        BookingResponse booking = expertService.arrivedAtJob(phone, bookingId);
+        String email = getAuthenticatedEmail();
+        log.info("Expert {} arrived at job {}", email, bookingId);
+        BookingResponse booking = expertService.arrivedAtJob(email, bookingId);
         return ResponseEntity.ok(booking);
     }
 
     @PostMapping("/jobs/{bookingId}/start")
     @Operation(summary = "Start job", description = "Mark that the job has started")
     public ResponseEntity<BookingResponse> startJob(@PathVariable Long bookingId) {
-        String phone = getAuthenticatedPhone();
-        log.info("Expert {} starting job {}", phone, bookingId);
-        BookingResponse booking = expertService.startJob(phone, bookingId);
+        String email = getAuthenticatedEmail();
+        log.info("Expert {} starting job {}", email, bookingId);
+        BookingResponse booking = expertService.startJob(email, bookingId);
         return ResponseEntity.ok(booking);
     }
 
     @PostMapping("/jobs/{bookingId}/complete")
     @Operation(summary = "Complete job", description = "Mark that the job has been completed")
     public ResponseEntity<BookingResponse> completeJob(@PathVariable Long bookingId) {
-        String phone = getAuthenticatedPhone();
-        log.info("Expert {} completing job {}", phone, bookingId);
-        BookingResponse booking = expertService.completeJob(phone, bookingId);
+        String email = getAuthenticatedEmail();
+        log.info("Expert {} completing job {}", email, bookingId);
+        BookingResponse booking = expertService.completeJob(email, bookingId);
         return ResponseEntity.ok(booking);
     }
 
@@ -112,10 +112,10 @@ public class ExpertController {
     public ResponseEntity<TicketResponse> reportIssue(
             @PathVariable Long bookingId,
             @RequestBody Map<String, String> request) {
-        String phone = getAuthenticatedPhone();
+        String email = getAuthenticatedEmail();
         String issue = request.getOrDefault("issue", "");
-        log.info("Expert {} reporting issue for job {}", phone, bookingId);
-        TicketResponse ticket = expertService.reportIssue(phone, bookingId, issue);
+        log.info("Expert {} reporting issue for job {}", email, bookingId);
+        TicketResponse ticket = expertService.reportIssue(email, bookingId, issue);
         return ResponseEntity.status(HttpStatus.CREATED).body(ticket);
     }
 }

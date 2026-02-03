@@ -33,7 +33,7 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
-    private String getAuthenticatedPhone() {
+    private String getAuthenticatedEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
     }
@@ -41,9 +41,9 @@ public class CustomerController {
     @GetMapping("/profile")
     @Operation(summary = "Get customer profile", description = "Get the authenticated customer's profile")
     public ResponseEntity<UserProfileResponse> getProfile() {
-        String phone = getAuthenticatedPhone();
-        log.info("Get profile for phone: {}", phone);
-        UserProfileResponse profile = customerService.getProfile(phone);
+        String email = getAuthenticatedEmail();
+        log.info("Get profile for email: {}", email);
+        UserProfileResponse profile = customerService.getProfile(email);
         return ResponseEntity.ok(profile);
     }
 
@@ -51,18 +51,18 @@ public class CustomerController {
     @Operation(summary = "Update customer profile", description = "Update the authenticated customer's profile")
     public ResponseEntity<UserProfileResponse> updateProfile(
             @Valid @RequestBody UpdateProfileRequest request) {
-        String phone = getAuthenticatedPhone();
-        log.info("Update profile for phone: {}", phone);
-        UserProfileResponse profile = customerService.updateProfile(phone, request);
+        String email = getAuthenticatedEmail();
+        log.info("Update profile for email: {}", email);
+        UserProfileResponse profile = customerService.updateProfile(email, request);
         return ResponseEntity.ok(profile);
     }
 
     @GetMapping("/addresses")
     @Operation(summary = "Get customer addresses", description = "Get all addresses for the authenticated customer")
     public ResponseEntity<List<AddressResponse>> getAddresses() {
-        String phone = getAuthenticatedPhone();
-        log.info("Get addresses for phone: {}", phone);
-        List<AddressResponse> addresses = customerService.getAddresses(phone);
+        String email = getAuthenticatedEmail();
+        log.info("Get addresses for email: {}", email);
+        List<AddressResponse> addresses = customerService.getAddresses(email);
         return ResponseEntity.ok(addresses);
     }
 
@@ -70,9 +70,9 @@ public class CustomerController {
     @Operation(summary = "Create customer address", description = "Create a new address for the authenticated customer")
     public ResponseEntity<AddressResponse> createAddress(
             @Valid @RequestBody AddressRequest request) {
-        String phone = getAuthenticatedPhone();
-        log.info("Create address for phone: {}", phone);
-        AddressResponse address = customerService.createAddress(phone, request);
+        String email = getAuthenticatedEmail();
+        log.info("Create address for email: {}", email);
+        AddressResponse address = customerService.createAddress(email, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(address);
     }
 
@@ -80,9 +80,9 @@ public class CustomerController {
     @Operation(summary = "Create booking", description = "Create a new booking for the authenticated customer")
     public ResponseEntity<BookingResponse> createBooking(
             @Valid @RequestBody BookingRequest request) {
-        String phone = getAuthenticatedPhone();
-        log.info("Create booking for phone: {}", phone);
-        BookingResponse booking = customerService.createBooking(phone, request);
+        String email = getAuthenticatedEmail();
+        log.info("Create booking for email: {}", email);
+        BookingResponse booking = customerService.createBooking(email, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(booking);
     }
 
@@ -93,19 +93,19 @@ public class CustomerController {
             @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size")
             @RequestParam(defaultValue = "10") int size) {
-        String phone = getAuthenticatedPhone();
-        log.info("Get bookings for phone: {}, page: {}, size: {}", phone, page, size);
+        String email = getAuthenticatedEmail();
+        log.info("Get bookings for email: {}, page: {}, size: {}", email, page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<BookingResponse> bookings = customerService.getBookings(phone, pageable);
+        Page<BookingResponse> bookings = customerService.getBookings(email, pageable);
         return ResponseEntity.ok(bookings);
     }
 
     @GetMapping("/bookings/{id}")
     @Operation(summary = "Get booking by ID", description = "Get a specific booking by ID for the authenticated customer")
     public ResponseEntity<BookingResponse> getBookingById(@PathVariable Long id) {
-        String phone = getAuthenticatedPhone();
-        log.info("Get booking {} for phone: {}", id, phone);
-        BookingResponse booking = customerService.getBookingById(phone, id);
+        String email = getAuthenticatedEmail();
+        log.info("Get booking {} for email: {}", id, email);
+        BookingResponse booking = customerService.getBookingById(email, id);
         return ResponseEntity.ok(booking);
     }
 
@@ -113,17 +113,17 @@ public class CustomerController {
     @Operation(summary = "Create payment", description = "Create a payment for the authenticated customer")
     public ResponseEntity<PaymentResponse> createPayment(
             @Valid @RequestBody PaymentRequest request) {
-        String phone = getAuthenticatedPhone();
-        log.info("Create payment for phone: {}", phone);
-        PaymentResponse payment = customerService.createPayment(phone, request);
+        String email = getAuthenticatedEmail();
+        log.info("Create payment for email: {}", email);
+        PaymentResponse payment = customerService.createPayment(email, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(payment);
     }
 
     @GetMapping("/payments/{id}")
     @Operation(summary = "Get payment by ID", description = "Get a specific payment by ID")
     public ResponseEntity<Map<String, String>> getPaymentById(@PathVariable Long id) {
-        String phone = getAuthenticatedPhone();
-        log.info("Get payment {} for phone: {}", id, phone);
+        String email = getAuthenticatedEmail();
+        log.info("Get payment {} for email: {}", id, email);
         return ResponseEntity.ok(Map.of(
             "message", "Payment retrieval endpoint",
             "paymentId", id.toString()
@@ -133,17 +133,17 @@ public class CustomerController {
     @PostMapping("/payments/{id}/confirm")
     @Operation(summary = "Confirm payment", description = "Confirm a payment for the authenticated customer")
     public ResponseEntity<PaymentResponse> confirmPayment(@PathVariable Long id) {
-        String phone = getAuthenticatedPhone();
-        log.info("Confirm payment {} for phone: {}", id, phone);
-        PaymentResponse payment = customerService.confirmPayment(phone, id);
+        String email = getAuthenticatedEmail();
+        log.info("Confirm payment {} for email: {}", id, email);
+        PaymentResponse payment = customerService.confirmPayment(email, id);
         return ResponseEntity.ok(payment);
     }
 
     @GetMapping("/bookings/{id}/receipt")
     @Operation(summary = "Get booking receipt", description = "Get receipt for a specific booking")
     public ResponseEntity<Map<String, String>> getBookingReceipt(@PathVariable Long id) {
-        String phone = getAuthenticatedPhone();
-        log.info("Get receipt for booking {} for phone: {}", id, phone);
+        String email = getAuthenticatedEmail();
+        log.info("Get receipt for booking {} for email: {}", id, email);
         return ResponseEntity.ok(Map.of(
             "message", "Receipt retrieval endpoint",
             "bookingId", id.toString()
@@ -155,9 +155,9 @@ public class CustomerController {
     public ResponseEntity<RatingResponse> rateBooking(
             @PathVariable Long id,
             @Valid @RequestBody RatingRequest request) {
-        String phone = getAuthenticatedPhone();
-        log.info("Rate booking {} for phone: {}", id, phone);
-        RatingResponse rating = customerService.createRating(phone, request);
+        String email = getAuthenticatedEmail();
+        log.info("Rate booking {} for email: {}", id, email);
+        RatingResponse rating = customerService.createRating(email, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(rating);
     }
 
@@ -165,9 +165,9 @@ public class CustomerController {
     @Operation(summary = "Create support ticket", description = "Create a support ticket")
     public ResponseEntity<TicketResponse> createTicket(
             @Valid @RequestBody TicketRequest request) {
-        String phone = getAuthenticatedPhone();
-        log.info("Create ticket for phone: {}", phone);
-        TicketResponse ticket = customerService.createTicket(phone, request);
+        String email = getAuthenticatedEmail();
+        log.info("Create ticket for email: {}", email);
+        TicketResponse ticket = customerService.createTicket(email, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ticket);
     }
 }

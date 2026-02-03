@@ -34,7 +34,7 @@ public class AdminController {
     private final AdminService adminService;
     private final ServiceManagementService serviceManagementService;
 
-    private String getAuthenticatedPhone() {
+    private String getAuthenticatedEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
     }
@@ -46,8 +46,8 @@ public class AdminController {
             @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size")
             @RequestParam(defaultValue = "10") int size) {
-        String phone = getAuthenticatedPhone();
-        log.info("Get all users requested by admin: {}, page: {}, size: {}", phone, page, size);
+        String email = getAuthenticatedEmail();
+        log.info("Get all users requested by admin: {}, page: {}, size: {}", email, page, size);
         Pageable pageable = PageRequest.of(page, size);
         Page<UserProfileResponse> users = adminService.getAllUsers(pageable);
         return ResponseEntity.ok(users);
@@ -58,8 +58,8 @@ public class AdminController {
     public ResponseEntity<UserProfileResponse> updateUserRoles(
             @PathVariable Long id,
             @RequestBody Set<String> roles) {
-        String phone = getAuthenticatedPhone();
-        log.info("Update roles for user {} by admin: {}", id, phone);
+        String email = getAuthenticatedEmail();
+        log.info("Update roles for user {} by admin: {}", id, email);
         UserProfileResponse user = adminService.updateUserRoles(id, roles);
         return ResponseEntity.ok(user);
     }
@@ -68,8 +68,8 @@ public class AdminController {
     @Operation(summary = "Create category", description = "Create a new service category")
     public ResponseEntity<CategoryResponse> createCategory(
             @Valid @RequestBody CategoryRequest request) {
-        String phone = getAuthenticatedPhone();
-        log.info("Create category by admin: {}", phone);
+        String email = getAuthenticatedEmail();
+        log.info("Create category by admin: {}", email);
         CategoryResponse category = adminService.createCategory(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
@@ -78,8 +78,8 @@ public class AdminController {
     @Operation(summary = "Create service", description = "Create a new service")
     public ResponseEntity<ServiceResponse> createService(
             @Valid @RequestBody ServiceRequest request) {
-        String phone = getAuthenticatedPhone();
-        log.info("Create service by admin: {}", phone);
+        String email = getAuthenticatedEmail();
+        log.info("Create service by admin: {}", email);
         ServiceResponse service = serviceManagementService.createService(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(service);
     }
@@ -87,8 +87,8 @@ public class AdminController {
     @PostMapping("/experts/{id}/approve")
     @Operation(summary = "Approve expert", description = "Approve an expert application")
     public ResponseEntity<UserProfileResponse> approveExpert(@PathVariable Long id) {
-        String phone = getAuthenticatedPhone();
-        log.info("Approve expert {} by admin: {}", id, phone);
+        String email = getAuthenticatedEmail();
+        log.info("Approve expert {} by admin: {}", id, email);
         UserProfileResponse expert = adminService.approveExpert(id);
         return ResponseEntity.ok(expert);
     }
@@ -96,8 +96,8 @@ public class AdminController {
     @PostMapping("/experts/{id}/reject")
     @Operation(summary = "Reject expert", description = "Reject an expert application")
     public ResponseEntity<UserProfileResponse> rejectExpert(@PathVariable Long id) {
-        String phone = getAuthenticatedPhone();
-        log.info("Reject expert {} by admin: {}", id, phone);
+        String email = getAuthenticatedEmail();
+        log.info("Reject expert {} by admin: {}", id, email);
         UserProfileResponse expert = adminService.rejectExpert(id);
         return ResponseEntity.ok(expert);
     }

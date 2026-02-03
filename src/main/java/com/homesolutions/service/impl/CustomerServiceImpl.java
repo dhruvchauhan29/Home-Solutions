@@ -33,19 +33,19 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserProfileResponse getProfile(String phone) {
-        log.info("Fetching profile for phone: {}", phone);
-        User user = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+    public UserProfileResponse getProfile(String email) {
+        log.info("Fetching profile for email: {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
         return mapToUserProfileResponse(user);
     }
 
     @Override
     @Transactional
-    public UserProfileResponse updateProfile(String phone, UpdateProfileRequest request) {
-        log.info("Updating profile for phone: {}", phone);
-        User user = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+    public UserProfileResponse updateProfile(String email, UpdateProfileRequest request) {
+        log.info("Updating profile for email: {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {
@@ -65,10 +65,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public AddressResponse createAddress(String phone, AddressRequest request) {
-        log.info("Creating address for phone: {}", phone);
-        User user = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+    public AddressResponse createAddress(String email, AddressRequest request) {
+        log.info("Creating address for email: {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         Address address = Address.builder()
                 .user(user)
@@ -87,10 +87,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AddressResponse> getAddresses(String phone) {
-        log.info("Fetching addresses for phone: {}", phone);
-        User user = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+    public List<AddressResponse> getAddresses(String email) {
+        log.info("Fetching addresses for email: {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         return addressRepository.findByUserIdOrderByIsDefaultDescCreatedAtDesc(user.getId())
                 .stream()
@@ -100,11 +100,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public BookingResponse createBooking(String phone, BookingRequest request) {
-        log.info("Creating booking for phone: {} with serviceId: {}", phone, request.getServiceId());
+    public BookingResponse createBooking(String email, BookingRequest request) {
+        log.info("Creating booking for email: {} with serviceId: {}", email, request.getServiceId());
 
-        User customer = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         com.homesolutions.entity.Service service = serviceRepository.findById(request.getServiceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found with ID: " + request.getServiceId()));
@@ -153,10 +153,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BookingResponse> getBookings(String phone, Pageable pageable) {
-        log.info("Fetching bookings for phone: {}", phone);
-        User customer = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+    public Page<BookingResponse> getBookings(String email, Pageable pageable) {
+        log.info("Fetching bookings for email: {}", email);
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         return bookingRepository.findByCustomerIdOrderByCreatedAtDesc(customer.getId(), pageable)
                 .map(this::mapToBookingResponse);
@@ -164,10 +164,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional(readOnly = true)
-    public BookingResponse getBookingById(String phone, Long bookingId) {
-        log.info("Fetching booking ID: {} for phone: {}", bookingId, phone);
-        User customer = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+    public BookingResponse getBookingById(String email, Long bookingId) {
+        log.info("Fetching booking ID: {} for email: {}", bookingId, email);
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + bookingId));
@@ -181,11 +181,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public PaymentResponse createPayment(String phone, PaymentRequest request) {
-        log.info("Creating payment for phone: {}, bookingId: {}", phone, request.getBookingId());
+    public PaymentResponse createPayment(String email, PaymentRequest request) {
+        log.info("Creating payment for email: {}, bookingId: {}", email, request.getBookingId());
 
-        User customer = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         Booking booking = bookingRepository.findById(request.getBookingId())
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + request.getBookingId()));
@@ -218,11 +218,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public PaymentResponse confirmPayment(String phone, Long paymentId) {
-        log.info("Confirming payment ID: {} for phone: {}", paymentId, phone);
+    public PaymentResponse confirmPayment(String email, Long paymentId) {
+        log.info("Confirming payment ID: {} for email: {}", paymentId, email);
 
-        User customer = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found with ID: " + paymentId));
@@ -249,11 +249,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public RatingResponse createRating(String phone, RatingRequest request) {
-        log.info("Creating rating for phone: {}, bookingId: {}", phone, request.getBookingId());
+    public RatingResponse createRating(String email, RatingRequest request) {
+        log.info("Creating rating for email: {}, bookingId: {}", email, request.getBookingId());
 
-        User customer = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         Booking booking = bookingRepository.findById(request.getBookingId())
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + request.getBookingId()));
@@ -290,11 +290,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public TicketResponse createTicket(String phone, TicketRequest request) {
-        log.info("Creating ticket for phone: {}", phone);
+    public TicketResponse createTicket(String email, TicketRequest request) {
+        log.info("Creating ticket for email: {}", email);
 
-        User customer = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User customer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         Booking booking = null;
         if (request.getBookingId() != null) {
