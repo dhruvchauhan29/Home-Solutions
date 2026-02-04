@@ -231,6 +231,19 @@ public class ExpertServiceImpl implements ExpertService {
         return mapToTicketResponse(ticket);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookingResponse> getPendingConfirmedBookingsForExpert() {
+        log.info("Fetching pending confirmed bookings for experts");
+
+        List<Booking> bookings = bookingRepository.findByStatusAndExpertIsNull(Booking.BookingStatus.CONFIRMED);
+
+        log.info("Found {} pending confirmed bookings", bookings.size());
+        return bookings.stream()
+                .map(this::mapToBookingResponse)
+                .toList();
+    }
+
     private UserProfileResponse mapToUserProfileResponse(User user) {
         return UserProfileResponse.builder()
                 .id(user.getId())

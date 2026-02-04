@@ -6,6 +6,8 @@ import com.homesolutions.dto.UserProfileResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ExpertService {
     UserProfileResponse onboard(String email, String details);
     Page<BookingResponse> getJobs(String email, Pageable pageable);
@@ -15,4 +17,5 @@ public interface ExpertService {
     BookingResponse startJob(String email, Long bookingId);
     BookingResponse completeJob(String email, Long bookingId);
     TicketResponse reportIssue(String email, Long bookingId, String issue);
+    List<BookingResponse> getPendingConfirmedBookingsForExpert();
 }

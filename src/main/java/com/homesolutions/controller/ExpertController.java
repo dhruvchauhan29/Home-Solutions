@@ -118,4 +118,12 @@ public class ExpertController {
         TicketResponse ticket = expertService.reportIssue(email, bookingId, issue);
         return ResponseEntity.status(HttpStatus.CREATED).body(ticket);
     }
+
+    @GetMapping("/bookings/pending")
+    @Operation(summary = "Get pending bookings", description = "Get all bookings that are paid and ready for acceptance by experts")
+    public ResponseEntity<java.util.List<BookingResponse>> getPendingBookings() {
+        log.info("Getting pending confirmed bookings for experts");
+        java.util.List<BookingResponse> bookings = expertService.getPendingConfirmedBookingsForExpert();
+        return ResponseEntity.ok(bookings);
+    }
 }
