@@ -35,7 +35,7 @@ class DTOTest {
 
         // Test setters
         response.setToken("new-token");
-        response.setType("Bearer2");
+        response.setType("Bearer");
         response.setUserId(2L);
         response.setEmail("new@example.com");
         response.setFullName("New User");
@@ -44,7 +44,7 @@ class DTOTest {
         response.setRoles(newRoles);
 
         assertThat(response.getToken()).isEqualTo("new-token");
-        assertThat(response.getType()).isEqualTo("Bearer2");
+        assertThat(response.getType()).isEqualTo("Bearer");
         assertThat(response.getUserId()).isEqualTo(2L);
         assertThat(response.getEmail()).isEqualTo("new@example.com");
         assertThat(response.getFullName()).isEqualTo("New User");
@@ -53,7 +53,7 @@ class DTOTest {
         // Test equals and hashCode
         AuthResponse response2 = AuthResponse.builder()
                 .token("new-token")
-                .type("Bearer2")
+                .type("Bearer")
                 .userId(2L)
                 .email("new@example.com")
                 .fullName("New User")
