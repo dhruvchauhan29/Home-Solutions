@@ -21,4 +21,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         @Param("status") Booking.BookingStatus status,
         @Param("cutoffTime") LocalDateTime cutoffTime
     );
+    
+    List<Booking> findByStatusAndExpertIsNull(Booking.BookingStatus status);
 }

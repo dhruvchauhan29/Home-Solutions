@@ -24,6 +24,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -229,6 +231,19 @@ public class ExpertServiceImpl implements ExpertService {
 
         log.info("Issue reported successfully with ticket ID: {}", ticket.getId());
         return mapToTicketResponse(ticket);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookingResponse> getPendingConfirmedBookingsForExpert() {
+        log.info("Fetching pending confirmed bookings for experts");
+
+        List<Booking> bookings = bookingRepository.findByStatusAndExpertIsNull(Booking.BookingStatus.CONFIRMED);
+
+        log.info("Found {} pending confirmed bookings", bookings.size());
+        return bookings.stream()
+                .map(this::mapToBookingResponse)
+                .toList();
     }
 
     private UserProfileResponse mapToUserProfileResponse(User user) {
