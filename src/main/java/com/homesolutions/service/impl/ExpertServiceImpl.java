@@ -35,11 +35,11 @@ public class ExpertServiceImpl implements ExpertService {
 
     @Override
     @Transactional
-    public UserProfileResponse onboard(String phone, String details) {
-        log.info("Onboarding expert with phone: {}", phone);
+    public UserProfileResponse onboard(String email, String details) {
+        log.info("Onboarding expert with email: {}", email);
 
-        User expert = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User expert = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         if (!expert.getRoles().contains("ROLE_EXPERT")) {
             throw new BusinessException("User is not an expert");
@@ -54,11 +54,11 @@ public class ExpertServiceImpl implements ExpertService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BookingResponse> getJobs(String phone, Pageable pageable) {
-        log.info("Fetching jobs for expert with phone: {}", phone);
+    public Page<BookingResponse> getJobs(String email, Pageable pageable) {
+        log.info("Fetching jobs for expert with email: {}", email);
 
-        User expert = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User expert = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         if (!expert.getRoles().contains("ROLE_EXPERT")) {
             throw new BusinessException("User is not an expert");
@@ -70,11 +70,11 @@ public class ExpertServiceImpl implements ExpertService {
 
     @Override
     @Transactional
-    public BookingResponse acceptJob(String phone, Long bookingId) {
-        log.info("Expert {} accepting job {}", phone, bookingId);
+    public BookingResponse acceptJob(String email, Long bookingId) {
+        log.info("Expert {} accepting job {}", email, bookingId);
 
-        User expert = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User expert = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         if (!expert.getRoles().contains("ROLE_EXPERT")) {
             throw new BusinessException("User is not an expert");
@@ -97,11 +97,11 @@ public class ExpertServiceImpl implements ExpertService {
 
     @Override
     @Transactional
-    public BookingResponse declineJob(String phone, Long bookingId) {
-        log.info("Expert {} declining job {}", phone, bookingId);
+    public BookingResponse declineJob(String email, Long bookingId) {
+        log.info("Expert {} declining job {}", email, bookingId);
 
-        User expert = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User expert = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         if (!expert.getRoles().contains("ROLE_EXPERT")) {
             throw new BusinessException("User is not an expert");
@@ -124,11 +124,11 @@ public class ExpertServiceImpl implements ExpertService {
 
     @Override
     @Transactional
-    public BookingResponse arrivedAtJob(String phone, Long bookingId) {
-        log.info("Expert {} arrived at job {}", phone, bookingId);
+    public BookingResponse arrivedAtJob(String email, Long bookingId) {
+        log.info("Expert {} arrived at job {}", email, bookingId);
 
-        User expert = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User expert = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + bookingId));
@@ -147,11 +147,11 @@ public class ExpertServiceImpl implements ExpertService {
 
     @Override
     @Transactional
-    public BookingResponse startJob(String phone, Long bookingId) {
-        log.info("Expert {} starting job {}", phone, bookingId);
+    public BookingResponse startJob(String email, Long bookingId) {
+        log.info("Expert {} starting job {}", email, bookingId);
 
-        User expert = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User expert = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + bookingId));
@@ -173,11 +173,11 @@ public class ExpertServiceImpl implements ExpertService {
 
     @Override
     @Transactional
-    public BookingResponse completeJob(String phone, Long bookingId) {
-        log.info("Expert {} completing job {}", phone, bookingId);
+    public BookingResponse completeJob(String email, Long bookingId) {
+        log.info("Expert {} completing job {}", email, bookingId);
 
-        User expert = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User expert = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + bookingId));
@@ -199,11 +199,11 @@ public class ExpertServiceImpl implements ExpertService {
 
     @Override
     @Transactional
-    public TicketResponse reportIssue(String phone, Long bookingId, String issue) {
-        log.info("Expert {} reporting issue for job {}", phone, bookingId);
+    public TicketResponse reportIssue(String email, Long bookingId, String issue) {
+        log.info("Expert {} reporting issue for job {}", email, bookingId);
 
-        User expert = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with phone: " + phone));
+        User expert = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         if (!expert.getRoles().contains("ROLE_EXPERT")) {
             throw new BusinessException("User is not an expert");

@@ -7,15 +7,15 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CustomerService {
-    UserProfileResponse getProfile(String phone);
-    UserProfileResponse updateProfile(String phone, UpdateProfileRequest request);
-    AddressResponse createAddress(String phone, AddressRequest request);
-    List<AddressResponse> getAddresses(String phone);
-    BookingResponse createBooking(String phone, BookingRequest request);
-    Page<BookingResponse> getBookings(String phone, Pageable pageable);
-    BookingResponse getBookingById(String phone, Long bookingId);
-    PaymentResponse createPayment(String phone, PaymentRequest request);
-    PaymentResponse confirmPayment(String phone, Long paymentId);
-    RatingResponse createRating(String phone, RatingRequest request);
-    TicketResponse createTicket(String phone, TicketRequest request);
+    UserProfileResponse getProfile(String email);
+    UserProfileResponse updateProfile(String email, UpdateProfileRequest request);
+    AddressResponse createAddress(String email, AddressRequest request);
+    List<AddressResponse> getAddresses(String email);
+    BookingResponse createBooking(String email, BookingRequest request);
+    Page<BookingResponse> getBookings(String email, Pageable pageable);
+    BookingResponse getBookingById(String email, Long bookingId);
+    PaymentResponse createPayment(String email, PaymentRequest request);
+    PaymentResponse confirmPayment(String email, Long paymentId);
+    RatingResponse createRating(String email, RatingRequest request);
+    TicketResponse createTicket(String email, TicketRequest request);
 }
