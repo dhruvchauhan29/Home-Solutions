@@ -32,6 +32,44 @@ class DTOTest {
         assertThat(response.getEmail()).isEqualTo("test@example.com");
         assertThat(response.getFullName()).isEqualTo("Test User");
         assertThat(response.getRoles()).contains("ROLE_CUSTOMER");
+
+        // Test setters
+        response.setToken("new-token");
+        response.setType("Bearer2");
+        response.setUserId(2L);
+        response.setEmail("new@example.com");
+        response.setFullName("New User");
+        Set<String> newRoles = new HashSet<>();
+        newRoles.add("ROLE_ADMIN");
+        response.setRoles(newRoles);
+
+        assertThat(response.getToken()).isEqualTo("new-token");
+        assertThat(response.getType()).isEqualTo("Bearer2");
+        assertThat(response.getUserId()).isEqualTo(2L);
+        assertThat(response.getEmail()).isEqualTo("new@example.com");
+        assertThat(response.getFullName()).isEqualTo("New User");
+        assertThat(response.getRoles()).contains("ROLE_ADMIN");
+
+        // Test equals and hashCode
+        AuthResponse response2 = AuthResponse.builder()
+                .token("new-token")
+                .type("Bearer2")
+                .userId(2L)
+                .email("new@example.com")
+                .fullName("New User")
+                .roles(newRoles)
+                .build();
+
+        assertThat(response).isEqualTo(response2);
+        assertThat(response.hashCode()).isEqualTo(response2.hashCode());
+
+        // Test toString
+        assertThat(response.toString()).contains("new-token");
+
+        // Test no-arg constructor
+        AuthResponse response3 = new AuthResponse();
+        response3.setToken("test");
+        assertThat(response3.getToken()).isEqualTo("test");
     }
 
     @Test
