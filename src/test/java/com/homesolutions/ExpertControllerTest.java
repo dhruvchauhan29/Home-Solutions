@@ -190,4 +190,23 @@ class ExpertControllerTest {
         mockMvc.perform(get("/expert/jobs"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @WithMockUser(username = "9876543210", roles = {"EXPERT"})
+    void testGetPendingBookings() throws Exception {
+        java.util.List<BookingResponse> bookings = java.util.Collections.singletonList(mockBooking);
+        when(expertService.getPendingConfirmedBookingsForExpert()).thenReturn(bookings);
+
+        mockMvc.perform(get("/expert/bookings/pending"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].status").value("ASSIGNED"));
+    }
+
+    @Test
+    void testGetPendingBookings_Unauthorized() throws Exception {
+        mockMvc.perform(get("/expert/bookings/pending"))
+                .andExpect(status().isUnauthorized());
+    }
 }

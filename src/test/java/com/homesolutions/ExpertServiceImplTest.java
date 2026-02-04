@@ -318,4 +318,32 @@ class ExpertServiceImplTest {
         verify(bookingRepository).findById(1L);
         verify(bookingRepository, never()).save(any());
     }
+
+    @Test
+    void testGetPendingConfirmedBookingsForExpert() {
+        when(bookingRepository.findByStatusAndExpertIsNull(Booking.BookingStatus.CONFIRMED))
+                .thenReturn(java.util.List.of(mockBooking));
+
+        java.util.List<BookingResponse> response = expertService.getPendingConfirmedBookingsForExpert();
+
+        assertThat(response).isNotNull();
+        assertThat(response).hasSize(1);
+        assertThat(response.get(0).getId()).isEqualTo(1L);
+        assertThat(response.get(0).getStatus()).isEqualTo("CONFIRMED");
+
+        verify(bookingRepository).findByStatusAndExpertIsNull(Booking.BookingStatus.CONFIRMED);
+    }
+
+    @Test
+    void testGetPendingConfirmedBookingsForExpert_EmptyList() {
+        when(bookingRepository.findByStatusAndExpertIsNull(Booking.BookingStatus.CONFIRMED))
+                .thenReturn(java.util.List.of());
+
+        java.util.List<BookingResponse> response = expertService.getPendingConfirmedBookingsForExpert();
+
+        assertThat(response).isNotNull();
+        assertThat(response).isEmpty();
+
+        verify(bookingRepository).findByStatusAndExpertIsNull(Booking.BookingStatus.CONFIRMED);
+    }
 }
