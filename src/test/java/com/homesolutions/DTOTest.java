@@ -341,4 +341,113 @@ class DTOTest {
         assertThat(request.getFullName()).isEqualTo("Updated Name");
         assertThat(request.getEmail()).isEqualTo("updated@example.com");
     }
+
+    @Test
+    void testBookingResponse() {
+        ServiceResponse service = ServiceResponse.builder()
+                .id(1L)
+                .name("Pipe Repair")
+                .build();
+        AddressResponse address = AddressResponse.builder()
+                .id(1L)
+                .street("123 Main St")
+                .build();
+
+        BookingResponse response = BookingResponse.builder()
+                .id(1L)
+                .customerId(1L)
+                .customerName("Test Customer")
+                .service(service)
+                .address(address)
+                .expertId(2L)
+                .expertName("Test Expert")
+                .scheduledAt(LocalDateTime.now().plusDays(1))
+                .durationMinutes(120)
+                .totalPrice(BigDecimal.valueOf(150.00))
+                .couponCode("DISCOUNT10")
+                .discount(BigDecimal.valueOf(15.00))
+                .status("PENDING")
+                .notes("Test notes")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getCustomerId()).isEqualTo(1L);
+        assertThat(response.getCustomerName()).isEqualTo("Test Customer");
+        assertThat(response.getService()).isNotNull();
+        assertThat(response.getService().getId()).isEqualTo(1L);
+        assertThat(response.getAddress()).isNotNull();
+        assertThat(response.getAddress().getId()).isEqualTo(1L);
+        assertThat(response.getExpertId()).isEqualTo(2L);
+        assertThat(response.getExpertName()).isEqualTo("Test Expert");
+        assertThat(response.getScheduledAt()).isNotNull();
+        assertThat(response.getDurationMinutes()).isEqualTo(120);
+        assertThat(response.getTotalPrice()).isEqualByComparingTo(BigDecimal.valueOf(150.00));
+        assertThat(response.getCouponCode()).isEqualTo("DISCOUNT10");
+        assertThat(response.getDiscount()).isEqualByComparingTo(BigDecimal.valueOf(15.00));
+        assertThat(response.getStatus()).isEqualTo("PENDING");
+        assertThat(response.getNotes()).isEqualTo("Test notes");
+        assertThat(response.getCreatedAt()).isNotNull();
+        assertThat(response.getUpdatedAt()).isNotNull();
+    }
+
+    @Test
+    void testPaymentRequest() {
+        PaymentRequest request = PaymentRequest.builder()
+                .bookingId(1L)
+                .method("CARD")
+                .build();
+
+        assertThat(request.getBookingId()).isEqualTo(1L);
+        assertThat(request.getMethod()).isEqualTo("CARD");
+    }
+
+    @Test
+    void testPaymentResponse() {
+        PaymentResponse response = PaymentResponse.builder()
+                .id(1L)
+                .bookingId(1L)
+                .amount(BigDecimal.valueOf(150.00))
+                .method("CARD")
+                .status("SUCCESS")
+                .transactionId("TXN123456")
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getBookingId()).isEqualTo(1L);
+        assertThat(response.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(150.00));
+        assertThat(response.getMethod()).isEqualTo("CARD");
+        assertThat(response.getStatus()).isEqualTo("SUCCESS");
+        assertThat(response.getTransactionId()).isEqualTo("TXN123456");
+        assertThat(response.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    void testTicketResponse() {
+        TicketResponse response = TicketResponse.builder()
+                .id(1L)
+                .userId(1L)
+                .userName("Test User")
+                .bookingId(1L)
+                .subject("Issue subject")
+                .description("Issue description")
+                .status("OPEN")
+                .priority("HIGH")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getUserId()).isEqualTo(1L);
+        assertThat(response.getUserName()).isEqualTo("Test User");
+        assertThat(response.getBookingId()).isEqualTo(1L);
+        assertThat(response.getSubject()).isEqualTo("Issue subject");
+        assertThat(response.getDescription()).isEqualTo("Issue description");
+        assertThat(response.getStatus()).isEqualTo("OPEN");
+        assertThat(response.getPriority()).isEqualTo("HIGH");
+        assertThat(response.getCreatedAt()).isNotNull();
+        assertThat(response.getUpdatedAt()).isNotNull();
+    }
 }
